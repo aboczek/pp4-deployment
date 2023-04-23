@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block template %}
+
+{% if user.is_authenticated %}
+{% if request.user.is_staff %}
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+            role="tab" aria-controls="home" aria-selected="true">Details</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
+            role="tab" aria-controls="profile" aria-selected="false">Skills</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button"
+            role="tab" aria-controls="contact" aria-selected="false">Projects</button>
+    </li>
+    <li id="logout-button">
+        <a href="{% url 'account_logout' %}">Logout</a>
+    </li>
+
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="container-lg mb-5">
+                <div class="row">
+                    <div class="col">
+                        <table class="input-skills">
+                            <tr>
+                                <td>
+                                    <!-- Details form-->
+                                    {{ details_form }}
+                                </td>
+                                <td class="btn-skills">
+                                    <button type="submit" class="btn btn-success">Create</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Edit details -->
+        <div class="container-lg">
+            <div class="row">
+                <div class="col">
+                    <h1 id="details">Details:</h1>
+                    <table class="details-table">
+                        {% for detail in details %}
+                        <tr class="details-table">
+                            <td>
+                                {{ detail.full_name }}
+                            </td>
+                            <td>
+                                {{ detail.age }}
+                            </td>
+                            <td>
+                                {{ detail.nationality }}
+                            </td>
+                            <td>
+                                {{ detail.languages }}
+                            </td>
+                            <td>
+                                {{ detail.address }}
+                            </td>
+                            <td>
+                                <a href="/edit-detail/{{ detail.id }}" class="btn-skills btn btn-info">Edit</a>
+                                <a href="/edit-delete/{{ detail.id }}" class="btn-skills btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="container-lg mb-5">
+                <div class="row">
+                    <div class="col">
+                        <table class="input-skills">
+                            <tr>
+                                <td>
+                                    <!-- Skills form -->
+                                    {{ skills_form }}
+                                </td>
+                                <td class="btn-skills">
+                                    <button type="submit" class="btn btn-success">Create</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Edit skills-->
+        <div>
+            <div class="container-lg mb-5">
+                <div class="row">
+                    <div class="col">
+                        <h1 id="skills">Skills:</h1>
+                        <div id="skills-info-panel">
+                            <table>
+                                {% for skill in skills %}
+                                <tr>
+                                    <td>
+                                        <p>{{ skill.skill }}</p>
+                                    </td>
+                                    <td>
+                                        <a href="/edit-skill/{{ skill.id }}"
+                                            class="btn-skills btn-padding btn btn-info">Edit</a>
+                                    </td>
+                                    <td>
+                                        <a href="/delete-skill/{{ skill.id }}"
+                                            class="btn-skills btn-padding btn btn-danger">Delete</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+        <div class="container-fluid mb-5">
+            <div class="row">
+                <div class="col-xl-6">
+                    <form method="POST" id="projects-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <table>
+                            <tr>
+                                <td>
+                                    <!-- Projects form -->
+                                    {{ projects_form }}
+                                </td>
+                                <td>
+                                    <div class="btn-skills">
+                                        <button class="btn btn-success" type="submit">Create</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+                <!-- Projects preview and editing -->
+                <div class="col-xl-6 mb-5" id="border-project">
+                    {% for project in my_projects %}
+                    <table>
+                        <tr>
+                            <td class="project-preview">
+                                <ul>
+                                    <li class="project-padding">
+                                        {{ project.title }}
+                                    </li>
+                                    <li>
+                                        <a href="{{ project.project_link }}"
+                                            target="_blank">{{ project.project_link }}</a>
+                                    </li>
+                                    <li>
+                                        <p>{{ project.project_description }}</p>
+                                    </li>
+                                    <li>
+                                        {% if "placeholder" in project.project_image.url %}
+                                        <img src="{% static 'images/placeholder.png' %}" alt="placeholder" width="300">
+                                        {% else %}
+                                        <img src="{{ project.project_image.url }}" alt="test" width="300">
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <a href="/edit-project/{{ project.id }}" class="btn-skills btn btn-info"
+                                    aria-label="edit project">Edit</a>
+                            </td>
+                            <td>
+                                <a href="/delete-project/{{ project.id }}" aria-label="delete project"
+                                    class="btn-skills btn-padding btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    </table>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- redirect button if unwanted user creates account -->
+    <div id="redirection">
+        <a href="{% url 'home' %}" class="btn-skills btn btn-danger">Go back</a>
+    </div>
+
+    {% endif %}
+    {% endif %}
+    {% endblock %}
